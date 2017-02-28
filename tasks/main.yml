@@ -14,24 +14,28 @@
   when: caddy_update
   register: caddy_features_cache
 
-- name: Download Caddy
-  get_url: url=https://caddyserver.com/download/build?os=linux&arch=amd64&features={{ caddy_features }} dest={{ caddy_home }}/caddy.tar.gz force=yes
-  when: caddy_releases_cache.changed or caddy_features_cache.changed
-  register: caddy_binary_cache
+- block:
+  - name: Download Caddy
+    get_url: url=https://caddyserver.com/download/build?os=linux&arch=amd64&features={{ caddy_features }} dest={{ caddy_home }}/caddy.tar.gz force=yes
+    when: caddy_releases_cache.changed or caddy_features_cache.changed
+    register: caddy_binary_cache
 
-- name: Download Caddy
-  get_url: url=https://caddyserver.com/download/build?os=linux&arch=amd64&features={{ caddy_features }} dest={{ caddy_home }}/caddy.tar.gz
+  - name: Download Caddy
+    get_url: url=https://caddyserver.com/download/build?os=linux&arch=amd64&features={{ caddy_features }} dest={{ caddy_home }}/caddy.tar.gz
 
-- name: Extract Caddy
-  unarchive: src={{ caddy_home }}/caddy.tar.gz dest={{ caddy_home }} copy=no owner={{ caddy_user }}
-  when: caddy_binary_cache.changed
+  - name: Extract Caddy
+    unarchive: src={{ caddy_home }}/caddy.tar.gz dest={{ caddy_home }} copy=no owner={{ caddy_user }}
+    when: caddy_binary_cache.changed
 
-- name: Extract Caddy
-  unarchive: src={{ caddy_home }}/caddy.tar.gz dest={{ caddy_home }} creates={{ caddy_home }}/caddy copy=no owner={{ caddy_user }}
+  - name: Extract Caddy
+    unarchive: src={{ caddy_home }}/caddy.tar.gz dest={{ caddy_home }} creates={{ caddy_home }}/caddy copy=no owner={{ caddy_user }}
 
-- name: Copy Caddy Binary
-  copy: src={{ caddy_home }}/caddy dest=/usr/local/bin/ mode=0755 remote_src=True
-  notify: Restart Caddy
+  - name: Copy Caddy Binary
+    copy: src={{ caddy_home }}/caddy dest=/usr/local/bin/ mode=0755 remote_src=True
+    notify: Restart Caddy
+  rescue:
+    - name: Clear features cache
+      file: dest={{caddy_home}}/features.txt state=absent
 
 - name: Create directories
   file: path={{ item }} state=directory owner={{ caddy_user }} mode=0700
