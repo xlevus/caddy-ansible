@@ -43,12 +43,12 @@
 
 - name: Create Caddyfile (Vars)
   when: caddy_config
-  copy: content="{{caddy_config}}" dest=/etc/caddy/Caddyfile owner={{ caddy_user }}
+  copy: content="{{caddy_config}}" dest=/etc/caddy/Caddyfile owner={{ caddy_user }} validate="caddy -validate -conf %s"
   notify: Restart Caddy
 
 - name: Create Caddyfile (Template)
   when: not caddy_config and caddy_template
-  template: src="{{caddy_template}}" dest=/etc/caddy/Caddyfile owner={{ caddy_user }}
+  template: src="{{caddy_template}}" dest=/etc/caddy/Caddyfile owner={{ caddy_user }} validate="caddy -validate -conf %s"
   notify: Restart Caddy
 
 - name: Check if systemd is running
