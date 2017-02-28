@@ -23,6 +23,13 @@ caddy_config: |
   root /var/www
   git github.com/antoiner77/caddy-ansible
 ```
+**Caddyfile from Template**<br>
+A caddyfile can be specified from a template if `caddy_config` is falsy and
+`caddy_template` is not.
+default:
+```
+caddy_template: ""
+```
 **Auto update Caddy?**<br>
 default:
 ```
