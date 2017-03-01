@@ -38,7 +38,7 @@
       file: dest={{caddy_home}}/features.txt state=absent
 
 - name: Create directories
-  file: path={{ item }} state=directory owner={{ caddy_user }} mode=0700
+  file: path={{ item }} state=directory owner={{ caddy_user }} group={{ caddy_user }} mode=0770
   with_items:
     - /etc/caddy
     - /etc/ssl/caddy
